@@ -26,8 +26,8 @@ async function run() {
   // GET all items
   app.get("/items", async (req, res) => {
     try {
-      const result = await itemsCollection.find().toArray();
-      res.send(result);
+      const items = await itemsCollection.find().toArray();
+      res.send(items);
     } catch (error) {
       res.status(500).send({ error: "Server error" });
     }
@@ -45,25 +45,50 @@ async function run() {
 
   // POST new product
   app.post("/items", async (req, res) => {
-    const newProduct = req.body;
-    const result = await itemsCollection.insertOne(newProduct);
+    const newItem = req.body;
+    const result = await itemsCollection.insertOne(newItem);
     res.send({ success: true, result });
   });
 
   // GET single product by ID
-app.get("/items/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const product = await itemsCollection.findOne({ _id: new ObjectId(id) });
-    if (!product) {
-      return res.status(404).send({ error: "Product not found" });
+// app.get("/items/:id", async (req, res) => {
+//   try {
+//     const id = req.params.id;
+//     const product = await itemsCollection.findOne({ _id: new ObjectId(id) });
+//     if (!product) {
+//       return res.status(404).send({ error: "Product not found" });
+//     }
+//     res.send(product);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send({ error: "Server error" });
+//   }
+// });
+
+  // GET single item by ID
+  app.get("/items/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const item = await itemsCollection.findOne({ _id: new ObjectId(id) });
+      if (!item) return res.status(404).send({ error: "Item not found" });
+      res.send(item);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({ error: "Server error" });
     }
-    res.send(product);
+  });
+
+
+  // GET offers (rating >= 4.5 or discount field)
+app.get("/offers", async (req, res) => {
+  try {
+    const offers = await itemsCollection.find({ rating: { $gte: 4.5 } }).toArray();
+    res.send(offers);
   } catch (error) {
-    console.error(error);
     res.status(500).send({ error: "Server error" });
   }
 });
+
 
 app.get("/ManageItems", async (req, res) => {
   try {
