@@ -43,27 +43,12 @@ async function run() {
     res.send(result);
   });
 
-  // POST new product
+  // POST new items
   app.post("/items", async (req, res) => {
     const newItem = req.body;
     const result = await itemsCollection.insertOne(newItem);
     res.send({ success: true, result });
   });
-
-  // GET single product by ID
-// app.get("/items/:id", async (req, res) => {
-//   try {
-//     const id = req.params.id;
-//     const product = await itemsCollection.findOne({ _id: new ObjectId(id) });
-//     if (!product) {
-//       return res.status(404).send({ error: "Product not found" });
-//     }
-//     res.send(product);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send({ error: "Server error" });
-//   }
-// });
 
   // GET single item by ID
   app.get("/items/:id", async (req, res) => {
@@ -89,47 +74,6 @@ app.get("/offers", async (req, res) => {
   }
 });
 
-
-app.get("/ManageItems", async (req, res) => {
-  try {
-    const email= req.query.email;
-    const query = email ? { addedBy : email } : {};
-    const result = await itemsCollection.find(query).toArray();
-    res.send(result);
-  } catch (error) {
-    res.status(500).send({ error: "Server error" });
-  } 
-});
-
-  // DELETE product by ID
-  app.delete("/ManageItems/:id", async (req, res) => {
-    try {
-      const id = req.params.id; 
-      const result = await itemsCollection.deleteOne({ _id: new ObjectId(id) });
-      if (result.deletedCount === 0) {
-        return res.status(404).send({ error: "Product not found" });
-      }
-      res.send({ success: true, result });
-    } catch (error) {
-      res.status(500).send({ error: "Server error" });
-    }
-  });
-  app.put("/ManageItems/:id", async (req, res) => {
-  try {
-    const id = req.params.id;
-    const updatedData = req.body;
-
-    const result = await itemsCollection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updatedData }
-    );
-
-    res.send(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ error: "Server error" });
-  }
-});
 
 //start of the index.js
   console.log("MongoDB Ready");
